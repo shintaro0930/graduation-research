@@ -26,12 +26,25 @@ def get_speech():
     for file_path in file_paths:
         tree = ET.parse(file_path)
         root = tree.getroot()
-        print(root.tag)
 
-    for speech_tag in root.findall('speech'):
-        speaker = speech_tag.find('spearker')
-        speaker_yomi = speech.find('speakerYomi')
-        speech = speech.find()
+    speech_list = []
+
+    for record in root.iter(tag='speechRecord'):
+        speaker = record.find('speaker').text
+        speaker_yomi = record.find('speakerYomi').text
+        speech = record.find('speech').text
+
+        # print(f'{speaker}({speaker_yomi}): {speech}')
+        tmp_list = [speaker, speaker_yomi, speech]
+        speech_list.append(tmp_list)
+
+    with open('./result.txt', 'w') as f:
+        for speech in speech_list:
+            speaker = speech[0]
+            speaker_yomi = speech[1]
+            content = speech[2].replace('\u3000', ' ')
+            f.write(f'{speaker}({speaker_yomi}): {content})\n')
+
 
 
 if __name__ == "__main__":
