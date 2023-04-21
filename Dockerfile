@@ -13,10 +13,13 @@ RUN apt-get update && \
     apt-get install -y swig && \
     apt-get install -y curl
 
-RUN pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
-
-RUN pip3 install --upgrade pip && \
+RUN pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html && \ 
+    pip3 install --upgrade pip && \
     pip3 install requests && \
     pip3 install MeCab-python3  && \
     pip3 install transformers && \
-    pip3 install transformers[ja]
+    pip3 install transformers[ja] && \
+    pip3 install sentencepiece && \
+    pip3 install beautifulsoup4
+
+RUN cp /etc/mecabrc /usr/local/etc/

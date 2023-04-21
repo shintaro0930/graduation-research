@@ -1,26 +1,26 @@
-from transformers import BertJapaneseTokenizer
-from transformers import BertModel
+import sentencepiece as spm
 
-model_name = 'cl-tohoku/bert-base-japanese'
-tokenizer = BertJapaneseTokenizer.from_pretrained(model_name)
+"""
+sentencepiece 入門: https://note.com/npaka/n/n90f97543ec4b
 
-text ="私が目指すのは、新しい資本主義の実現です。成長を目指すことは極めて重要であり、その実現に向けて全力で取り組みます。"
+"""
 
-token = tokenizer.tokenize(text)
-print(token)
 
-input_ids = tokenizer.encode(text)
-print(input_ids)
-
-tokens = tokenizer.convert_ids_to_tokens(input_ids)
-print(tokens)
-
-encoding = tokenizer(
-    text, 
-    max_length =35, 
-    padding ="max_length", 
-    truncation=True,
-    return_tensors="pt"
+# 学習の実行
+spm.SentencePieceTrainer.Train(
+    '--input=wiki.txt --model_prefix=sentencepiece --vocab_size=8000 --character_coverage=0.9995'
 )
-print(encoding)
 
+corpus = []
+
+# モデルの作成
+sp = spm.SentencePieceProcessor()
+sp.Load("sentencepiece.model")
+
+# テキストを語彙列に分割
+print(corpus[0])
+print(sp.EncodeAsPieces(corpus[0]))
+
+# テキストを語彙IDに分割
+print(corpus[0])
+print(sp.EncodeAsIds(corpus[0]))
