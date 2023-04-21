@@ -17,4 +17,6 @@ RUN pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 
 
 RUN pip3 install --upgrade pip && \
     pip3 install requests && \
-    pip3 install MeCab-python3 
+    pip3 install MeCab-python3  && \
+    pip3 install transformers && \
+    pip3 install transformers[ja]
