@@ -5,7 +5,7 @@ import re
 def convert_kanji_to_int(string):
     result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
     convert_table = {"十": "0", "百": "00", "千": "000", "万": "0000", "億": "00000000", "兆": "000000000000", "京": "0000000000000000"}
-    unit_list = "|".join(convert_table.keys())
+    unit_list:list = "|".join(convert_table.keys())      # unit_list = 十|百|千|...
     while re.search(unit_list, result):
         for unit in convert_table.keys():
             zeros = convert_table[unit]
@@ -34,11 +34,12 @@ def main():
         tmp_list = [speaker, speaker_yomi, speech]
         speech_list.append(tmp_list)
 
-    with open('./result.txt', 'w') as f:
+    with open('./tmp_result.txt', 'w') as f:
         for speech in speech_list:
             speaker = speech[0]
             speaker_yomi = speech[1]
-            content = speech[2].replace('\u3000', ' ')
+            content = speech[2]
+            # content = speech[2].replace('\u3000', ' ')
             f.write(f'{speaker}({speaker_yomi}): {content}\n\n')
 
 
