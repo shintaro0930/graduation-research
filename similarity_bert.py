@@ -3,6 +3,12 @@ from numpy.linalg import norm
 from transformers import BertModel
 from transformers import BertJapaneseTokenizer
 
+
+
+"""
+動かないのでデバッグが必要
+"""
+
 tokenizer = BertJapaneseTokenizer.from_pretrained('cl-tohoku/bert-base-japanese-whole-word-masking')
 bert_model = BertModel.from_pretrained('cl-tohoku/bert-base-japanese-whole-word-masking')
 

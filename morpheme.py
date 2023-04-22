@@ -14,13 +14,3 @@ for word in mecab.parse(testwords).splitlines()[:-1]:
 
 print(word_list)
 print(''.join(word_list))
-
-# with open('morpheme_result.txt', 'w') as f:
-#     f.write(mecab.parse(testwords))
-
-#     for c in tagger.parse(text).splitlines()[:-1]:
-#         surface, feature = c.split('\t')
-#         pos = feature.split(',')[0]
-#         if pos == '名詞':
-#             words.append(surface)
-#    return ' '.join(words)

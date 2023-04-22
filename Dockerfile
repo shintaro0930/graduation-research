@@ -22,4 +22,5 @@ RUN pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 
     pip3 install sentencepiece && \
     pip3 install beautifulsoup4
 
-RUN cp /etc/mecabrc /usr/local/etc/
+# morphome-analysis
+RUN cp /etc/mecabrc /usr/local/etc/ 
