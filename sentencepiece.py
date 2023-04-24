@@ -11,14 +11,14 @@ spm.SentencePieceTrainer.Train(
     '--input=wiki.txt --model_prefix=sentencepiece --vocab_size=8000 --character_coverage=0.9995'
 )
 
-# # モデルの作成
-# sp = spm.SentencePieceProcessor()
-# sp.Load("sentencepiece.model")
+# モデルの作成
+sp = spm.SentencePieceProcessor()
+sp.Load("sentencepiece.model")
 
-# # テキストを語彙列に分割
-# print(corpus[0])
-# print(sp.EncodeAsPieces(corpus[0]))
+# テキストを語彙列に分割
+print(corpus[0])
+print(sp.EncodeAsPieces(corpus[0]))
 
-# # テキストを語彙IDに分割
-# print(corpus[0])
-# print(sp.EncodeAsIds(corpus[0]))
+# テキストを語彙IDに分割
+print(corpus[0])
+print(sp.EncodeAsIds(corpus[0]))

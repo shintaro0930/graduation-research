@@ -3,8 +3,6 @@ from numpy.linalg import norm
 from transformers import BertModel
 from transformers import BertJapaneseTokenizer
 
-
-
 """
 動かないのでデバッグが必要
 """
