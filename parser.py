@@ -1,6 +1,10 @@
 import xml.etree.ElementTree as ET
 import glob
 import re
+import MeCab
+
+mecab = MeCab.Tagger ("-d /work/mecab-ipadic-neologd/build/mecab-ipadic-2.7.0-20070801-neologd-20200910/")
+
 
 def convert_kanji_to_int(string):
     result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
@@ -25,22 +29,43 @@ def main():
         root = tree.getroot()
 
     speech_list = []
+    word_list:list = [] # 形態素解析の結果を格納
 
     for record in root.iter(tag='speechRecord'):
         speaker = record.find('speaker').text
         speaker_yomi = record.find('speakerYomi').text
+        speaker_group= record.find('speakerGroup').text
         speech = record.find('speech').text
+        name_of_house = record.find('nameOfHouse').text
+        date = record.find('date').text
+        name_of_meeting = record.find('nameOfMeeting').text
 
-        tmp_list = [speaker, speaker_yomi, speech]
+        tmp_list = [speaker, speaker_yomi, speech, speaker_group]
         speech_list.append(tmp_list)
 
     with open('./tmp_result.txt', 'w') as f:
+        f.write(f'{date}/{name_of_house}/{name_of_meeting}\n\n\n')
         for speech in speech_list:
             speaker = speech[0]
             speaker_yomi = speech[1]
             content = speech[2]
+            speaker_group = speech[3]
+
+            for word in mecab.parse(content).splitlines()[:-1]:
+                feature, surface = word.split('\t')
+                word_list.append(feature)
+            
+            print(word_list)
+            print(''.join(word_list))
+
+
+
             # content = speech[2].replace('\u3000', ' ')
-            f.write(f'{speaker}({speaker_yomi}): {content}\n\n')
+            """
+            ○委員長（河野義博君）
+            これにマッチするよう正規表現を組む.そしてこれを削除する.
+            """
+            f.write(f'{speaker}({speaker_yomi}/{speaker_group}): {content}\n\n')
 
 
 # speech[2]に漢数字を数字に変換する必要がある。ただしその区別はついていない
