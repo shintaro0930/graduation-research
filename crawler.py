@@ -8,6 +8,11 @@ import os
 """
 参考リンク
 https://qiita.com/kenta1984/items/1acfddb3d920a11e6c8b
+
+
+国会議事録APIを用いて全議会録をクローリングする
+
+2023/4/1時点で使う必要はないはず
 """
 
 def main(year:int) -> None:

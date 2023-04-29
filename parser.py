@@ -2,6 +2,10 @@ import xml.etree.ElementTree as ET
 import glob
 import re
 
+"""
+国会議事録ファイル(xmlファイル)から読めるようにパースして, 'result.txt'ファイルに書き込む
+"""
+
 def convert_kanji_to_int(string):
     result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
     convert_table = {"十": "0", "百": "00", "千": "000", "万": "0000", "億": "00000000", "兆": "000000000000", "京": "0000000000000000"}

@@ -1,32 +1,51 @@
 from transformers import BertJapaneseTokenizer
 from transformers import BertModel
+from transformers import BertForSequenceClassification, AdamW, BertConfig
+import torch
 
+print(torch.cuda.is_available())
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using {device} device")
 
-
-
-
-model_name = 'cl-tohoku/bert-base-japanese-whole-word-masking'
+model_name = 'cl-tohoku/bert-base-japanese'
 tokenizer = BertJapaneseTokenizer.from_pretrained(model_name)
-bert_model = BertModel.from_pretrained(model_name)
 
-bert_model.to("cuda")
+text ="私が目指すのは、新しい資本主義の実現です。成長を目指すことは極めて重要であり、その実現に向けて全力で取り組みます。"
 
-text = "XXX"
-input = tokenizer(text, return_tensors="pt")
+token = tokenizer.tokenize(text)
+# print(token)
 
-input["input_ids"] = input["input_ids"].to("cuda")
-input["token_type_ids"] = input["token_type_ids"].to("cuda")
-input["attention_mask"] = input["attention_mask"].to("cuda")
 
-outputs = bert_model(**input)
-last_hidden_states = outputs.last_hidden_state
-attention_mask = input.attention_mask.unsqueeze(-1)
-valid_token_num = attention_mask.sum(1)
-sentence_vec = (last_hidden_states*attention_mask).sum(1) / valid_token_num
-sentence_vec = sentence_vec.detach().cpu().numpy()[0]
+# BERTの入力データ
+input_ids = tokenizer.encode(text)
+print(input_ids)
 
-# BERTで作成した文ベクトルのshape
-print(sentence_vec.shape)
+tokens = tokenizer.convert_ids_to_tokens(input_ids)
+# print(tokens)
 
-# BERTで作成した文ベクトル
-print(sentence_vec)
+encoding = tokenizer(
+text, 
+max_length = 35, 
+padding ="max_length", 
+truncation=True,
+return_tensors="pt"
+)
+print("============")
+print(type(encoding))
+print(encoding['input_ids'])
+
+
+for encode in encoding:
+    print("===****===")
+    print(encoding[encode])
+
+model = BertForSequenceClassification.from_pretrained(
+    model_name,                     #日本語pre-trainedモデルの指定
+    num_labels = 2,                 # ラベル数 (True/Falseの2択)
+    output_attentions = False,      # Attention Vectorを追加するかどうか
+    output_hidden_states = False,       # 隠れ層を出力するか
+)
+
+#モデルをGPUへ
+model = model.to(device)
+
