@@ -2,7 +2,6 @@ import sentencepiece as spm
 
 # spm: SentencePiece Model
 
-
 """
 sentencepiece 入門: https://note.com/npaka/n/n90f97543ec4b
 sentencepieceを使ってみた: https://analytics-note.xyz/machine-learning/sentencepiece-usage/

@@ -51,4 +51,4 @@ print("=====\n[MASK]されたところに入る可能性の高い文字をtop5�
 for i, index_t in enumerate(predictions.indices):
     index = index_t.item()
     token = tokenizer.convert_ids_to_tokens([index])[0]
-    print(i, token)
+    print(i+1, token)
