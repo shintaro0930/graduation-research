@@ -1,5 +1,4 @@
-from transformers import BertJapaneseTokenizer
-from transformers import BertForMaskedLM
+from transformers import BertJapaneseTokenizer, BertForMaskedLM
 import torch
 import logging
 
