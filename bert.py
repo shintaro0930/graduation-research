@@ -11,7 +11,6 @@ model_name = 'cl-tohoku/bert-base-japanese'
 tokenizer = BertJapaneseTokenizer.from_pretrained(model_name)
 
 text ="私が目指すのは、新しい資本主義の実現です。成長を目指すことは極めて重要であり、その実現に向けて全力で取り組みます。"
-# text = "テレビでサッカーの試合をみる。"
 
 token = tokenizer.tokenize(text)
 masked_index = 2
