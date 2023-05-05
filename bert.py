@@ -52,3 +52,5 @@ for i, index_t in enumerate(predictions.indices):
     index = index_t.item()
     token = tokenizer.convert_ids_to_tokens([index])[0]
     print(i+1, token)
+
+print("from gpu2")
