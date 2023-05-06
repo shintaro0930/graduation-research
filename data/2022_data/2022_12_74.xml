@@ -1,6 +1,9 @@
 <data>
+    <!-- numberOfRecords 総結果件数 -->
     <numberOfRecords>7425</numberOfRecords>
+    <!-- 何件返ってきたか -->
     <numberOfReturn>25</numberOfReturn>
+    <!-- 開始位置 -->
     <startRecord>7401</startRecord>
     <records>
         <record>

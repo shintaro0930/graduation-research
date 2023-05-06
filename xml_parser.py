@@ -23,17 +23,19 @@ def convert_kanji_to_int(string):
     return result
 
 def main(): 
+    # 69074
     file_paths = glob.glob('./data/2022_data/2022_12_74.xml', recursive=True)
     for file_path in file_paths:
         tree = ET.parse(file_path)
         root = tree.getroot()
 
     speech_list = []
-
+    
     for record in root.iter(tag='speechRecord'):
         speaker = record.find('speaker').text
         speaker_yomi = record.find('speakerYomi').text
         speech = record.find('speech').text
+        date = record.find('date').text
 
         tmp_list = [speaker, speaker_yomi, speech]
         speech_list.append(tmp_list)
@@ -44,6 +46,7 @@ def main():
             speaker_yomi = speech[1]
             content = speech[2].replace('\u3000', ' ')
             f.write(f'{speaker}({speaker_yomi}): {content}\n\n')
+    
 
 
 # speech[2]に漢数字を数字に変換する必要がある。ただしその区別はついていない

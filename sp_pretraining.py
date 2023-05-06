@@ -12,5 +12,5 @@ spm.SentencePieceTrainer.train(
     input = "result.txt",
     model_type = "bpe",     # Byte Pair Encoding algorithm
     model_prefix = './sp/sp_bpe',
-    vocab_size = 8000,
+    vocab_size = 32000,
 )

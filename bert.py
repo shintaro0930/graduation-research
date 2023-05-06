@@ -11,6 +11,7 @@ tokenizer = BertJapaneseTokenizer.from_pretrained(model_name)
 
 text ="私が目指すのは、新しい資本主義の実現です。成長を目指すことは極めて重要であり、その実現に向けて全力で取り組みます。"
 
+#日本語BERTはMeCabで形態素解析
 token = tokenizer.tokenize(text)
 masked_index = 2
 # Masked_tokenを2番目のトークンに置き換えるために先頭に[DUMMY]を挿入 / [CLS]トークンが消されないように
@@ -52,5 +53,3 @@ for i, index_t in enumerate(predictions.indices):
     index = index_t.item()
     token = tokenizer.convert_ids_to_tokens([index])[0]
     print(i+1, token)
-
-print("from gpu2")
