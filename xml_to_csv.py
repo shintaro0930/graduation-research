@@ -23,14 +23,21 @@ def main():
     # できれば上から順番になるようにしたい
 
     """rangeの日付は適宜変更"""
-    for i in range(2022, 2023):
+    for i in range(1947, 2023):
         file_paths:list = glob.glob('/work/data/' + str(i) + '_data/*.xml', recursive=True)
         for file in file_paths:
             tree = ET.parse(file)
             root = tree.getroot()
-            speech_list = []
+
+            try:
+                make_dir = '/work/csv_data/' + str(i) + '_data'
+                if not os.path.exists(make_dir):
+                    os.makedirs(make_dir)
+            except Exception as e:
+                continue            
 
             for record in root.iter(tag='speechRecord'):
+                speech_list = []
                 speaker = record.find('speaker').text
                 speaker_yomi = record.find('speakerYomi').text
                 speech = record.find('speech').text
@@ -50,21 +57,11 @@ def main():
                     speaker_group, 
                     speech
                 ])
-            
-            # ファイル作成
 
-
-            # ファイル書き込み
-            try:
-                make_dir = '/work/csv_data/' + str(i) + '_data'
-                if not os.path.exists(make_dir):
-                    os.makedirs(make_dir)
-            except Exception as e:
-                continue
-
-            with open('/work/csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='w') as f:
-                writer = csv.writer(f) 
-                writer.writerows(speech_list)
+                with open('/work/csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
+                    writer = csv.writer(f) 
+                    writer.writerows(speech_list)
+                print(speech_list)
 
 
 if __name__ == "__main__":
