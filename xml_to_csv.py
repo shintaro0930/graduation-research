@@ -1,12 +1,28 @@
 import xml.etree.ElementTree as ET
 import glob
-import re
 import csv
 import os
+import re
 
 """
 xml -> tsv
 """
+
+def convert_kanji_to_int(string):
+    result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
+    convert_table = {"十": "0", "百": "00", "千": "000", "万": "0000", "億": "00000000", "兆": "000000000000", "京": "0000000000000000"}
+    unit_list = "|".join(convert_table.keys())
+    while re.search(unit_list, result):
+        for unit in convert_table.keys():
+            zeros = convert_table[unit]
+            for numbers in re.findall(f"(\d+){unit}(\d+)", result):
+                result = result.replace(numbers[0] + unit + numbers[1], numbers[0] + zeros[len(numbers[1]):len(zeros)] + numbers[1])
+            for number in re.findall(f"(\d+){unit}", result):
+                result = result.replace(number + unit, number + zeros)
+            for number in re.findall(f"{unit}(\d+)", result):
+                result = result.replace(unit + number, "1" + zeros[len(number):len(zeros)] + number)
+            result = result.replace(unit, "1" + zeros)
+    return result
 
 def count_file(dir_path) -> int:
     count:int = 0
@@ -45,9 +61,7 @@ def main():
                 speaker_group = record.find('speakerGroup').text
                 name_of_house = record.find('nameOfHouse').text
                 name_of_meeting = record.find('nameOfMeeting').text
-
-                # tmp_list = [date, speaker, speaker_yomi, speech, speaker_group, name_of_house, name_of_meeting]
-                # speech_list.append(tmp_list)
+                
                 speech_list.append([
                     date, 
                     name_of_house, 
