@@ -1,7 +1,6 @@
 import sentencepiece as spm
 
 
-
 def Tokenizer(text):
     sp = spm.SentencePieceProcessor(model_file='./sp/sp_bpe.model')
 
