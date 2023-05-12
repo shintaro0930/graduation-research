@@ -18,28 +18,25 @@ https://qiita.com/Robot-Inventor/items/2264590f392a1a9e8831
 # 言語モデルを読み込みます
 nlp = spacy.load("ja_core_news_md")
 
-def calculate_similarity(text):
-    # 文章全体と"賛成"という単語をトークン化します
-    doc = nlp(text)
-    support_token = nlp("賛成")[0]
+def find_text(text, pattern):
+    """特定の単語にパターンマッチしたときにその位置以降のテキストを出力する関数。
 
-    # トークンを単語ベクトルに変換します
-    support_vec = support_token.vector
-    doc_vec = doc.vector
+    Args:
+    text: テキスト。
+    pattern: パターン。
 
-    # コサイン類似度を計算します
-    similarity = doc_vec.dot(support_vec) / (np.linalg.norm(doc_vec) * np.linalg.norm(support_vec))
-    plt.scatter(len(text), similarity)
+    Returns:
+    パターンにマッチしたテキスト。
+    """
 
-    plt.title(u'cos_sim between text and "pro"')
-    plt.xlabel(u'text size')
-    plt.ylabel(u'cos_sim')
-    plt.savefig('sample.png')
-    plt.xlim(0, 500) 
-    plt.show()
+    # パターンを検索します。
+    match = re.search(pattern, text)
 
-    print(similarity)
-    return similarity
+    # パターンにマッチしたテキストを返します。
+    if match:
+        return text[match.start():]
+    else:
+        return None
 
 def labeling(text):
     # 賛成に近しい単語リスト
@@ -129,11 +126,23 @@ def converter(string):
     return result
 
 
+import re
+
+def get_title(text):
+    pattern = r"本日の会議に付した案件(.*?)$"
+    match = re.search(pattern, text, re.MULTILINE | re.DOTALL)
+    
+    if match:
+        title = match.group(1).strip()
+        return title
+    else:
+        return "明記なし"
+
 def main():
     """rangeの日付は適宜変更"""
-    for i in range(2022, 2023):
+    for i in range(1947, 2023):
         file_paths: list = glob.glob(
-            '/work/data/' + str(i) + '_data/2022_*.xml', recursive=True)
+            '/work/data/' + str(i) + '_data/' + str(i) + '_*.xml', recursive=True)
         for file in file_paths:
             tree = ET.parse(file)
             root = tree.getroot()
@@ -162,7 +171,8 @@ def main():
                     speaker,
                     speaker_yomi,
                     speaker_group,
-                    labeling(speech),
+                    # get_title(speech),
+                    # labeling(speech),
                     pattern_match(speech)
                 ])
                 with open('/work/csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
