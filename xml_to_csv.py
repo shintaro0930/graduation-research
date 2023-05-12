@@ -133,13 +133,13 @@ def main():
     """rangeの日付は適宜変更"""
     for i in range(2022, 2023):
         file_paths: list = glob.glob(
-            '/work/data/' + str(i) + '_data/2022_12_*.xml', recursive=True)
+            '/work/data/' + str(i) + '_data/2022_*.xml', recursive=True)
         for file in file_paths:
             tree = ET.parse(file)
             root = tree.getroot()
 
             try:
-                make_dir = '/work/tmp_data/' + str(i) + '_data'
+                make_dir = '/work/csv_data/' + str(i) + '_data'
                 if not os.path.exists(make_dir):
                     os.makedirs(make_dir)
             except Exception as e:
@@ -165,7 +165,7 @@ def main():
                     labeling(speech),
                     pattern_match(speech)
                 ])
-                with open('/work/tmp_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
+                with open('/work/csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
                     writer = csv.writer(f)
                     writer.writerows(speech_list)
                     # print(speech_list)
