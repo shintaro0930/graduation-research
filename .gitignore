@@ -1,8 +1,7 @@
 /data
 /__pycache__
 /mecab-ipadic-neologd
-!/data/2022_data/2022_12_74.xml
 /csv_data
-!/csv_data/2022_data/2022-12-22.csv
 /nohup.out
 /tmp_data
+/cyber.py

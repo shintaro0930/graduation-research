@@ -15,10 +15,10 @@ xml -> csv
 https://qiita.com/Robot-Inventor/items/2264590f392a1a9e8831
 """
 
-# 言語モデルを読み込みます
 nlp = spacy.load("ja_core_news_md")
 
 def find_text(text, pattern):
+    
     """特定の単語にパターンマッチしたときにその位置以降のテキストを出力する関数。
 
     Args:
@@ -29,17 +29,14 @@ def find_text(text, pattern):
     パターンにマッチしたテキスト。
     """
 
-    # パターンを検索します。
     match = re.search(pattern, text)
 
-    # パターンにマッチしたテキストを返します。
     if match:
         return text[match.start():]
     else:
         return None
 
 def labeling(text):
-    # 賛成に近しい単語リスト
     support_words = [
         "賛成",
         "賛同",
@@ -60,37 +57,26 @@ def labeling(text):
         "前向きに受け止める",
         "前向きな姿勢"
     ]
-    # 賛成に近しい単語をトークン化します
+
     support_tokens = [nlp(w)[0] for w in support_words]
 
-    # 文章全体をトークン化します
     doc = nlp(text)
 
-    # 賛成に近しい単語と文章全体とのcos類似度を計算します
     support_similarities = [cosine_similarity(t.vector.reshape(1, -1), support_token.vector.reshape(1, -1))[0][0] for t in doc for support_token in support_tokens]
+    average_cos_similarity = sum(support_similarities) / len(support_similarities)
+    print(f'{average_cos_similarity:.2f}')
 
-    # 賛成に近しい単語とのcos類似度の最大値を求めます
-    max_support_similarity = max(support_similarities)
-    print(max_support_similarity)
-    plt.scatter(len(text), max_support_similarity)
+    plt.scatter(len(text), average_cos_similarity)
     plt.xlim(0, 500)
     plt.title(u'cos_sim between text and "pro"')
     plt.xlabel(u'text size')
     plt.ylabel(u'cos_sim')
     plt.savefig('sample.png')
-
-    # cos類似度の閾値を設定して、賛成に近しいと判定するかどうかを決めます
-    # threshold = 0.3
-    # if max_support_similarity >= threshold:
-    #     label = 1
-    # else:
-    #     label = 0 if "反対" in text else 2
-
-    return max_support_similarity
+    return average_cos_similarity
 
 
 def pattern_match(text):
-    yen_regex = r"(〇|一|二|三|四|五|六|七|八|九|十|百|千|万)+(円|枚|人|名|億|兆|件|団体|代)"
+    yen_regex = r"(〇|一|二|三|四|五|六|七|八|九|十|百|千|万)+(円|枚|人|名|億|兆|件|団体|代|店舗|週間|年間|日間|回|波|か月)"
     per_regex = r"(〇|一|二|三|四|五|六|七|八|九)*(・)*(〇|一|二|三|四|五|六|七|八|九)(％|倍|億円|兆円)"
     date_regex = r"(〇|一|二|三|四|五|六|七|八|九|十|千|百|万)+(月|日|歳|年|時|分|秒|つ)"
 
@@ -108,6 +94,11 @@ def pattern_match(text):
 
     return text
 
+def split_sentences(text):
+    sentences = text.split('。')
+    sentences = [s.strip() + '。' for s in sentences if s.strip()] 
+    return sentences
+
 def converter(string):
     result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
     convert_table = {"十": "0", "百": "00", "千": "000", "万": "0000"}
@@ -124,9 +115,6 @@ def converter(string):
                 unit + number, "1" + zeros[len(number):len(zeros)] + number)
         result = result.replace(unit, "1" + zeros)
     return result
-
-
-import re
 
 def get_title(text):
     pattern = r"本日の会議に付した案件(.*?)$"
@@ -171,14 +159,19 @@ def main():
                     speaker,
                     speaker_yomi,
                     speaker_group,
-                    # get_title(speech),
-                    # labeling(speech),
+                    '',
+                    '',
                     pattern_match(speech)
                 ])
-                with open('/work/csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
+
+                with open('./csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
                     writer = csv.writer(f)
-                    writer.writerows(speech_list)
-                    # print(speech_list)
+                    for speech_item in speech_list:
+                        speech = speech_item[8] 
+                        sentences = split_sentences(speech) 
+                        for sentence in sentences:
+                            row = speech_item[:8] + [sentence]
+                            writer.writerow(row)
 
 
 if __name__ == "__main__":
