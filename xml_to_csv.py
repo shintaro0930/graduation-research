@@ -116,21 +116,11 @@ def converter(string):
         result = result.replace(unit, "1" + zeros)
     return result
 
-def get_title(text):
-    pattern = r"本日の会議に付した案件(.*?)$"
-    match = re.search(pattern, text, re.MULTILINE | re.DOTALL)
-    
-    if match:
-        title = match.group(1).strip()
-        return title
-    else:
-        return "明記なし"
 
 def main():
     """rangeの日付は適宜変更"""
     for i in range(1947, 2023):
-        file_paths: list = glob.glob(
-            '/work/data/' + str(i) + '_data/' + str(i) + '_*.xml', recursive=True)
+        file_paths: list = glob.glob('/work/xml_data/' + str(i) + '_data/' + str(i) + '_*.xml', recursive=True)
         for file in file_paths:
             tree = ET.parse(file)
             root = tree.getroot()
@@ -146,12 +136,12 @@ def main():
                 speech_list = []
                 speaker = record.find('speaker').text
                 speaker_yomi = record.find('speakerYomi').text
-                speech = record.find('speech').text
+                speech = record.find('speech').text   
+                speech = re.sub(r"○(.*)　", "", speech)
                 date = record.find('date').text
                 speaker_group = record.find('speakerGroup').text
                 name_of_house = record.find('nameOfHouse').text
                 name_of_meeting = record.find('nameOfMeeting').text
-
                 speech_list.append([
                     date,
                     name_of_house,
@@ -163,8 +153,7 @@ def main():
                     '',
                     pattern_match(speech)
                 ])
-
-                with open('./csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
+                with open('/work/csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
                     writer = csv.writer(f)
                     for speech_item in speech_list:
                         speech = speech_item[8] 
