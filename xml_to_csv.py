@@ -155,12 +155,14 @@ def main():
                 ])
                 with open('/work/csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
                     writer = csv.writer(f)
-                    for speech_item in speech_list:
-                        speech = speech_item[8] 
-                        sentences = split_sentences(speech) 
-                        for sentence in sentences:
-                            row = speech_item[:8] + [sentence]
-                            writer.writerow(row)
+                    for speech in speech_list:
+                        writer.writerow(speech)
+                    # for speech_item in speech_list:
+                    #     speech = speech_item[8] 
+                    #     sentences = split_sentences(speech) 
+                    #     for sentence in sentences:
+                    #         row = speech_item[:8] + [sentence]
+                    #         writer.writerow(row)
 
 
 if __name__ == "__main__":
