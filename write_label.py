@@ -4,6 +4,20 @@ import re
 import os
 
 
+"""
+このファイルでやること
+- タイトルの半自動設定(中身が1つならば自動で付与, 複数ある場合は人手付与)
+    - 日付、委員会などが合っているかif文で確認してから付与
+- 半自動で賛成反対ラベル付与
+    - 正規表現を主に使う
+- さらに要らないものを消す
+    - 始めます。とか、そういうのは要らない。
+- 漢数字をアラビア数字にするラストチャンス
+    - 漢数字をgetして、それが果たして正しいのか
+
+"""
+
+
 def converter(string):
     result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
     convert_table = {"十": "0", "百": "00", "千": "000", "万": "0000"}
@@ -25,10 +39,10 @@ def main():
     csv_date = '2022-02-02.csv'
     for i in range(2022, 2023):
         row = []
-        # file_paths = glob.glob('/work/csv_data/' + str(i) + '_data/*.csv', recursive=True)
-        file_paths = glob.glob('/work/csv_data/' + str(i) + '_data/' + csv_date, recursive=True)
+        file_paths = glob.glob('/work/csv_data/' + str(i) + '_data/*.csv', recursive=True)
+        # file_paths = glob.glob('/work/csv_data/' + str(i) + '_data/' + csv_date, recursive=True)
 
-        for file in file_paths:
+        for csv_file in csv_file_paths,title_file in title_file_paths:
             with open(file, 'r') as csv_read_file:
                 reader = csv.reader(csv_read_file)
                 rows = list(reader)
@@ -73,6 +87,8 @@ def main():
                         break
                     else:
                         print("無効な入力です")
+
+
 
 if __name__ == "__main__":
     main()

@@ -5,8 +5,6 @@ import os
 import re
 import spacy
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics.pairwise import cosine_similarity
 
 """
 xml -> csv
@@ -42,22 +40,11 @@ def get_label(text):
 
 
 def pattern_match(text):
-    yen_regex = r"(〇|一|二|三|四|五|六|七|八|九|十|百|千|万)+(円|枚|人|名|億|兆|件|団体|代|店舗|週間|年間|日間|回|波|か月|年度)"
-    per_regex = r"(〇|一|二|三|四|五|六|七|八|九)*(・)*(〇|一|二|三|四|五|六|七|八|九)(％|倍|億円|兆円)"
-    date_regex = r"(〇|一|二|三|四|五|六|七|八|九|十|千|百|万)+(月|日|歳|年|時|分|秒|つ|割|社|問)"
-
-    yen_matches = re.finditer(yen_regex, text, re.MULTILINE)
-    for match in yen_matches:
+    regex = r"((〇|一|二|三|四|五|六|七|八|九)*(・)*(〇|一|二|三|四|五|六|七|八|九|十|千|百|万)+(円|枚|人|名|件|団体|代|店舗|週間|年間|日間|回|波|か月|年度|％|倍|兆|億|月|日|歳|年|時|分|秒|つ|割|社|問|棟))"
+    matches = re.finditer(regex, text, re.MULTILINE)
+    for match in matches:
         text = text.replace(match.group(), converter(match.group()))
-
-    date_matches = re.finditer(date_regex, text, re.MULTILINE)
-    for match in date_matches:
-        text = text.replace(match.group(), converter(match.group()))
-
-    per_matches = re.finditer(per_regex, text, re.MULTILINE)
-    for match in per_matches:
-        text = text.replace(match.group(), converter(match.group()).replace('・', '.'))
-
+    text = text.replace('・', '.')
     return text
 
 def split_sentences(text):
@@ -68,7 +55,7 @@ def split_sentences(text):
 
 def converter(string):
     result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
-    convert_table = {"十": "0", "百": "00", "千": "000", "万": "0000"}
+    convert_table = {"十": "0", "百": "00", "千": "000"}
 
     for unit in convert_table.keys():
         zeros = convert_table[unit]
@@ -87,7 +74,10 @@ def main():
     """rangeの日付は適宜変更"""
     for i in range(2022, 2023):
         file_paths: list = glob.glob('/work/xml_data/' + str(i) + '_data/' + str(i) + '_*.xml', recursive=True)
-        for file in file_paths:
+        #ファイルのソート
+        sorted_files = sorted(file_paths, key=lambda x: tuple(map(int, re.findall(r'\d+', x))))
+
+        for file in sorted_files:
             tree = ET.parse(file)
             root = tree.getroot()
 
@@ -125,7 +115,7 @@ def main():
                 # マッチした場合はそのブロック全てを削除
                 #議題を取得できる                
                 if re.search(r'((―+)\◇(―+))|(―+)|((午前|午後)(\d*|零)(時)(\d*|零)(分)*(開会|休憩|閉会|散会|開議))', speech):
-                    pattern = r'本日の会議に付した案件\n([\s\S]*)'
+                    pattern = r'(○)*本日の会議に付した案件\n([\s\S]*)'
                     match = re.search(pattern, speech)
     
                     if match:
