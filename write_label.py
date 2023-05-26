@@ -4,7 +4,7 @@ import re
 import os
 
 def main():
-    csv_date = '2022-01-17.csv'
+    csv_date = '2022-02-02.csv'
     for i in range(2022, 2023):
         row = []
         # file_paths = glob.glob('/work/csv_data/' + str(i) + '_data/*.csv', recursive=True)
@@ -25,7 +25,12 @@ def main():
             for row in rows:
                 print(row[8])
                 while True:
-                    user_input = input("1: 賛成, 0: 反対, 2: どちらでもない, 3: 議題を含む: , 4:ゴミ")
+
+                    # 質問なのか、応答なのかの分類
+                    # 正規表現で賛成なのか、反対なのか
+                    # 議題の取得2
+
+                    user_input = input("1: 賛成, 0: 反対, 2: どちらでもない, 3: 議題を含む: , 4:ゴミ: ")
                     if user_input in ['0', '1', '2', '3', '4']:
                         print("入力された値:", user_input)
                         row[7] = user_input 

@@ -76,7 +76,7 @@ def labeling(text):
 
 
 def pattern_match(text):
-    yen_regex = r"(〇|一|二|三|四|五|六|七|八|九|十|百|千|万)+(円|枚|人|名|億|兆|件|団体|代|店舗|週間|年間|日間|回|波|か月)"
+    yen_regex = r"(〇|一|二|三|四|五|六|七|八|九|十|百|千|万)+(円|枚|人|名|億|兆|件|団体|代|店舗|週間|年間|日間|回|波|か月|年度)"
     per_regex = r"(〇|一|二|三|四|五|六|七|八|九)*(・)*(〇|一|二|三|四|五|六|七|八|九)(％|倍|億円|兆円)"
     date_regex = r"(〇|一|二|三|四|五|六|七|八|九|十|千|百|万)+(月|日|歳|年|時|分|秒|つ)"
 
@@ -98,6 +98,7 @@ def split_sentences(text):
     sentences = text.split('。')
     sentences = [s.strip() + '。' for s in sentences if s.strip()] 
     return sentences
+    
 
 def converter(string):
     result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
@@ -116,10 +117,9 @@ def converter(string):
         result = result.replace(unit, "1" + zeros)
     return result
 
-
 def main():
     """rangeの日付は適宜変更"""
-    for i in range(1947, 2023):
+    for i in range(2022, 2023):
         file_paths: list = glob.glob('/work/xml_data/' + str(i) + '_data/' + str(i) + '_*.xml', recursive=True)
         for file in file_paths:
             tree = ET.parse(file)
@@ -138,31 +138,30 @@ def main():
                 speaker_yomi = record.find('speakerYomi').text
                 speech = record.find('speech').text   
                 speech = re.sub(r"○(.*)　", "", speech)
+                speech = re.sub(r"(〔.*〕)|(（.*）)", "", speech)
                 date = record.find('date').text
                 speaker_group = record.find('speakerGroup').text
                 name_of_house = record.find('nameOfHouse').text
                 name_of_meeting = record.find('nameOfMeeting').text
-                speech_list.append([
-                    date,
-                    name_of_house,
-                    name_of_meeting,
-                    speaker,
-                    speaker_yomi,
-                    speaker_group,
-                    '',
-                    '',
-                    pattern_match(speech)
-                ])
-                with open('/work/csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
-                    writer = csv.writer(f)
-                    for speech in speech_list:
-                        writer.writerow(speech)
-                    # for speech_item in speech_list:
-                    #     speech = speech_item[8] 
-                    #     sentences = split_sentences(speech) 
-                    #     for sentence in sentences:
-                    #         row = speech_item[:8] + [sentence]
-                    #         writer.writerow(row)
+                if re.search(r'((―+)\◇(―+))|(―+)', speech):
+                    # マッチした場合はそのブロック全てを削除
+                    continue
+                else:
+                    speech_list.append([
+                        date,
+                        name_of_house,
+                        name_of_meeting,
+                        speaker,
+                        speaker_yomi,
+                        speaker_group,
+                        '',     # 議題
+                        '',     # 賛成 or 反対 or それ以外
+                        pattern_match(speech)
+                    ])
+                    with open('/work/csv_data/' + str(i) + '_data/' + str(date) + '.csv', mode='a') as f:
+                        writer = csv.writer(f)
+                        for speech in speech_list:
+                            writer.writerow(speech)
 
 
 if __name__ == "__main__":
