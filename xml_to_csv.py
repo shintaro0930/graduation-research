@@ -72,7 +72,7 @@ def converter(string):
 
 def main():
     """rangeの日付は適宜変更"""
-    for i in range(2022, 2023):
+    for i in range(1947, 2023):
         file_paths: list = glob.glob('/work/xml_data/' + str(i) + '_data/' + str(i) + '_*.xml', recursive=True)
         #ファイルのソート
         sorted_files = sorted(file_paths, key=lambda x: tuple(map(int, re.findall(r'\d+', x))))
