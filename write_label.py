@@ -18,6 +18,31 @@ import os
 """
 
 
+# 質問なのか、応答なのかの分類
+# 正規表現で賛成なのか、反対なのか
+
+# if you cannot get the label from automatic evaluations, then label = 3
+def get_label(text) -> int:
+    label = 3
+
+    #automatic evaluation
+    """WRITE ME"""
+
+
+
+
+    #human evaluation
+    if label == 3:
+        print(text)
+        while True:
+            user_input = input('1:賛成, 0:反対, 2:どちらでもない')
+            if user_input in ['0', '1', '2']:
+                label = user_input 
+                break
+            else:
+                print("無効な入力です")
+    return label
+
 def converter(string):
     result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
     convert_table = {"十": "0", "百": "00", "千": "000", "万": "0000"}
@@ -68,21 +93,24 @@ def main():
 
             for row_csv in rows_csv:
                 with open('/work/label_data/' + str(i) + '_data/' + row_csv[0] + '.csv', 'a') as csv_write_file:
+                    # insert the title
                     for row_title in rows_title:
                         if row_csv[0] == row_title[0] and row_csv[1] == row_title[1] and row_csv[2] == row_title[2] and row_title[8]:
                             row_title[8] = row_title[8].replace('\n\n', '\n').replace('\n', ' ')
                             """ row_titleをさらにsplitしてその数が >= 1なら、タイトルを選択するように"""
                             row_csv[6] = row_title[8]
+                    
+
+                    #get the label (0,1,2)
+                    label = get_label(row_csv[8])
+                    row_csv[7] = label
+                        
                     writer = csv.writer(csv_write_file)
                     writer.writerow(row_csv)
+                        
 
-            # for row in rows_csv:
-            #     print(row[8])
-                # while True:
 
-                    # 質問なのか、応答なのかの分類
-                    # 正規表現で賛成なのか、反対なのか
-                    # 議題の取得2
+
 
                     # 漢数字 + 10分が出てきたら適宜出力 
                     # それをそのままにするのか or アラビア数字に直すか
@@ -97,19 +125,6 @@ def main():
                     #         else:  
                     #             print('無効な入力です')
                                 
-
-
-                    # user_input = input("1: 賛成, 0: 反対, 2: どちらでもない, 3: 議題を含む: , 4:ゴミ: ")
-                    # if user_input in ['0', '1', '2', '3', '4']:
-                    #     print("入力された値:", user_input)
-                    #     row[7] = user_input 
-                    #     with open('/work/label_data/' + str(i) + '_data/' + csv_date, 'a') as csv_write_file:
-                    #         writer = csv.writer(csv_write_file)
-                    #         writer.writerow(row)
-                    #     break
-                    # else:
-                    #     print("無効な入力です")
-
 
 
 if __name__ == "__main__":
