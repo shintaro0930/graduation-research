@@ -98,7 +98,7 @@ def main():
                     # get the title
                     if match:
                         result = match.group()
-                        result = re.sub('○|本日の会議に付した案件\n', '', result)
+                        result = re.sub('○|本日の会議に付した案件\n', '', result).replace(r'((午前|午後)(\d*|零)(時)(\d*|零)(分)*(開会|休憩|閉会|散会|開議))', '')
 
                         title_list.append([
                             date,

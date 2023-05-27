@@ -15,6 +15,7 @@ import os
     - 対話以外基本的に要らない
 - 漢数字をアラビア数字にするラストチャンス
     - 漢数字をgetして、それが果たして正しいのか
+    faf
 
 
 """
@@ -23,76 +24,60 @@ import os
 # 質問なのか、応答なのかの分類
 # 正規表現で賛成なのか、反対なのか
 
-# if you cannot get the label from automatic evaluations, then label = 3
 def get_label(text) -> int:
-    label = 3
-
-    #automatic evaluation
-    """WRITE ME"""
-
-    # 対話以外のものを消す
-    """
-    賛成表現
-        必要である
-        賛成する
-        であると思う
-
-    反対表現
-        反対する
-        不必要である
-        承知しない
-        信用しない
-        ではないと思う
-    
-    削除対象
-        これより会議を開きます。
-        蔓延防止等重点措置の実施について御報告いたします。
-        各党の皆様におかれましても、何とぞ御理解と御協力をお願いいたします。
-        順次これを許します。  
-        御異議ありませんか
-        お諮りいたします。
-        御異議なしと認めます。
-        起立を求めます。
-        以上、御報告申し上げます。
-
-    
-    """
-
-    pattern_pro = r"WRITEME"    # 引っ掛かれば人手入力
-    pattern_con = r"WRITEME"    # 引っ掛かれば人手入力
-    pattern_others = r"WRITEME" # これにかかる場合は削除する
+    pattern_pro = r"(必要(で|だ)(ある|あり)(と考え|と思))|(賛成(する|すべき|したい|したく))|"    # 引っ掛かれば人手入力
+    pattern_con = r"(反対(します|する|して|しようと|だと|で)|(不必要)|信用(しない|されない|できない)|(総理|大臣)に質問します|(総理|大臣)に伺います|(総理|大臣)にお尋ねします|)"    # 引っ掛かれば人手入力
+    pattern_others = r"(ありがとうございます|ありがとうございました|終わります)" # 2
 
     if re.search(pattern_pro, text):
-        label = 1
-    elif re.search(pattern_con, text):
-        label = 0
-    elif re.search(pattern_others, text):
-        label = 2
-    else:
-        """
-        WRITE ME
-        while文で入力できるように
-        """
-        return 0
-
-
-    #human evaluation
-    if label == 3:
         print(text)
         while True:
-            user_input = input('1:賛成, 0:反対, 2:どちらでもない')
-            if user_input in ['0', '1', '2']:
-                label = user_input 
+            label = 1
+            print(f'PCは{label}です')
+            user_input = input('修正する場合は 0:反対, 2:なし : ')
+            if user_input == '0':
+                label = 0
+                break                
+            elif user_input == '2':
+                label = 2
                 break
+            elif user_input == '':
+                break           
             else:
-                print("無効な入力です")
+                print('無効な入力です')
+    elif re.search(pattern_con, text):
+        print(text)
+        while True:
+            label = 0
+            print(f'PCは{label}です')
+            user_input = input('修正する場合は 1:賛成, 2:なし : ')
+            if user_input == '1':
+                label = 1
+                break                
+            elif user_input == '2':
+                label = 2
+                break
+            elif user_input == '':
+                break           
+            else:
+                print('無効な入力です')
+    else:
+        label = 2
     return label
-
 
 # enough or 10 minutes
 def enough_or_minutes(text):
     result = text
     return result
+
+# アラビア数字の変換(ラストチャンス)
+def pattern_match(text):
+    regex = r"((〇|一|二|三|四|五|六|七|八|九)*(・)*(〇|一|二|三|四|五|六|七|八|九|十|千|百|万)+(円|枚|人|名|件|団体|代|店舗|週間|年間|日間|回|波|か月|年度|％|倍|兆|億|月|日|歳|年|時|分|秒|つ|割|社|問|棟|メートル|))"
+    matches = re.finditer(regex, text, re.MULTILINE)
+    for match in matches:
+        text = text.replace(match.group(), converter(match.group()))
+    text = text.replace('・', '.')
+    return text
 
 # change kansuji to arabic numerals
 def converter(string):
@@ -111,6 +96,42 @@ def converter(string):
                 unit + number, "1" + zeros[len(number):len(zeros)] + number)
         result = result.replace(unit, "1" + zeros)
     return result
+
+def get_title(text):
+    title = ""
+    title_pattern = r'((まず|次に|最後)(.*)について)'
+    matches = re.finditer(title_pattern, text, re.MULTILINE)
+    if matches:
+        print(text)        
+        topics = [match[0] or match[1] for match in matches]
+        replaced_topic = []
+        for j, topic in enumerate(topics):
+            topic = topic.replace('について', '').replace('まずは、', '').replace('まずは', '').replace('まず、', '').replace('まず', '').replace('次に、', '').replace('最後に、', '').replace('最後に', '')
+            replaced_topic.append({j: topic})
+        
+            while True:
+                for topic in replaced_topic:
+                    for key, value in topic.items():
+                        print(f"{key}: {value}")
+
+                user_input = input("======タイトルに合う数字を入力してください: =======")
+                if user_input == '':
+                    return ''
+                found = False
+                for topic in replaced_topic:
+                    for key in topic.keys():
+                        if str(key) == user_input:
+                            title = topic[key]
+                            found = True
+                            break
+                    if found:
+                        break
+
+                if found:
+                    break
+
+        return title
+
 
 def main():
     """
@@ -143,22 +164,34 @@ def main():
                 reader_title = csv.reader(title_read_file)
                 rows_title = list(reader_title)
 
+            count = 0
             for row_csv in rows_csv:
-                with open('/work/label_data/' + str(i) + '_data/' + row_csv[0] + '.csv', 'a') as csv_write_file:
-                    # insert the title
-                    for row_title in rows_title:
-                        if row_csv[0] == row_title[0] and row_csv[1] == row_title[1] and row_csv[2] == row_title[2] and row_title[8]:
-                            row_title[8] = row_title[8].replace('\n\n', '\n').replace('\n', ' ')
-                            """ row_titleをさらにsplitしてその数が >= 1なら、タイトルを選択するように"""
-                            row_csv[6] = row_title[8]
-                    
+                count += 1
+                if count == 1:
+                    speaker = row_csv[3]
+                
+                remove_match = r"(これより|ただいまから)|((.*)の実施について(ご|御)報告(いた|致)します)|(何とぞ(ご|御)理解と(ご|御)協力をお願いいたします)|(順次これを許します)|((ご|御)異議(は)*ありませんか)|(お諮りいたします)|(御異議なしと認めます)|(起立を求めます)|(以上、御報告申し上げます)|(そのように決しました)|(関連質疑の申出があります)|(これにて(.*)の質疑は終了いたしました)|(持ち時間の範囲内でこれを許します)"                
+                if not (row_csv[3] == speaker or re.search(remove_match, row_csv[8])):                    
+                    with open('/work/label_data/' + str(i) + '_data/' + row_csv[0] + '.csv', 'a') as csv_write_file:
+                        for row_title in rows_title:
+                            row_title[8].replace('\n\n', '\n').replace('\n', ' ')
+                            candidate_title = row_title[8].split()
+                            idx = 0
+                            if len(candidate_title) == 1 and row_csv[1] == row_title[1] and row_csv[2] == row_title[2]:
+                                row_csv[6] = candidate_title[0]
+                                idx= 1
 
-                    #get the label (0,1,2)
-                    label = get_label(row_csv[8])
-                    row_csv[7] = label
+                        title_pattern = r'((まず|次に|最後)(.*)について)'
+                        matches = re.finditer(title_pattern, row_csv[8])                            
+                        count = sum(1 for _ in matches)                        
+                        if (idx == 0 and count >= 1):
+                            row_csv[6]  = get_title(row_csv[8])
+
                         
-                    writer = csv.writer(csv_write_file)
-                    writer.writerow(row_csv)
+                        # label = get_label(row_csv[8])
+                        # row_csv[7] = label
+                        writer = csv.writer(csv_write_file)
+                        writer.writerow(row_csv)
                         
 
 
@@ -179,11 +212,16 @@ def main():
                     """
 
                     """
-                        matches = re.finditer(regex, text, re.MULTILINE)
-                        for match in matches:
-                            text = text.replace(match.group(), converter(match.group()))
+                    
+                    if row_csv[0] == row_title[0] and row_csv[1] == row_title[1] and row_csv[2] == row_title[2] and row_title[8]:
+                        row_title[8] = row_title[8].replace('\n\n', '\n').replace('\n', ' ')
+                    
+                        row_titleをさらにsplitしてその数が >= 1なら、タイトルを選択するように
+                        row_csv[8]の中で (次に)|(次に、)~~~について(主に)|(誰に)伺ってまいります|伺います|伺いたいと思います
+                                        ~~~がタイトル
+                        その時はspeakerを変更しておく
+                        row_csv[6] = row_title[8]   
                     """
-                                
 
 
 if __name__ == "__main__":
