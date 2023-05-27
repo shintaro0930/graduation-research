@@ -12,8 +12,10 @@ import os
     - 正規表現を主に使う
 - さらに要らないものを消す
     - 始めます。とか、そういうのは要らない。
+    - 対話以外基本的に要らない
 - 漢数字をアラビア数字にするラストチャンス
     - 漢数字をgetして、それが果たして正しいのか
+
 
 """
 
@@ -28,7 +30,50 @@ def get_label(text) -> int:
     #automatic evaluation
     """WRITE ME"""
 
+    # 対話以外のものを消す
+    """
+    賛成表現
+        必要である
+        賛成する
+        であると思う
 
+    反対表現
+        反対する
+        不必要である
+        承知しない
+        信用しない
+        ではないと思う
+    
+    削除対象
+        これより会議を開きます。
+        蔓延防止等重点措置の実施について御報告いたします。
+        各党の皆様におかれましても、何とぞ御理解と御協力をお願いいたします。
+        順次これを許します。  
+        御異議ありませんか
+        お諮りいたします。
+        御異議なしと認めます。
+        起立を求めます。
+        以上、御報告申し上げます。
+
+    
+    """
+
+    pattern_pro = r"WRITEME"    # 引っ掛かれば人手入力
+    pattern_con = r"WRITEME"    # 引っ掛かれば人手入力
+    pattern_others = r"WRITEME" # これにかかる場合は削除する
+
+    if re.search(pattern_pro, text):
+        label = 1
+    elif re.search(pattern_con, text):
+        label = 0
+    elif re.search(pattern_others, text):
+        label = 2
+    else:
+        """
+        WRITE ME
+        while文で入力できるように
+        """
+        return 0
 
 
     #human evaluation
@@ -43,6 +88,13 @@ def get_label(text) -> int:
                 print("無効な入力です")
     return label
 
+
+# enough or 10 minutes
+def enough_or_minutes(text):
+    result = text
+    return result
+
+# change kansuji to arabic numerals
 def converter(string):
     result = string.translate(str.maketrans("〇一二三四五六七八九", "0123456789", ""))
     convert_table = {"十": "0", "百": "00", "千": "000", "万": "0000"}
@@ -111,19 +163,26 @@ def main():
 
 
 
+                    """
+                        漢数字 + 10分が出てきたら適宜出力 
+                        それをそのままにするのか or アラビア数字に直すか
+                        while True:
+                            if re.search('((〇|一|二|三|四|五|六|七|八|九|十|百|千|万)+)|(10分)', row[8]):
+                                user_input = input('1: アラビア数字に変更, 0: そのまま')
+                                if user_input == '1':
+                                    converter(row[8])
+                                    break
+                                elif user_input == '0':
+                                    break
+                                else:  
+                                    print('無効な入力です')
+                    """
 
-                    # 漢数字 + 10分が出てきたら適宜出力 
-                    # それをそのままにするのか or アラビア数字に直すか
-                    # while True:
-                    #     if re.search('((〇|一|二|三|四|五|六|七|八|九|十|百|千|万)+)|(10分)', row[8]):
-                    #         user_input = input('1: アラビア数字に変更, 0: そのまま')
-                    #         if user_input == '1':
-                    #             converter(row[8])
-                    #             break
-                    #         elif user_input == '0':
-                    #             break
-                    #         else:  
-                    #             print('無効な入力です')
+                    """
+                        matches = re.finditer(regex, text, re.MULTILINE)
+                        for match in matches:
+                            text = text.replace(match.group(), converter(match.group()))
+                    """
                                 
 
 
