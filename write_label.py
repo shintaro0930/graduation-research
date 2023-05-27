@@ -106,31 +106,27 @@ def get_title(text):
         topics = [match[0] or match[1] for match in matches]
         replaced_topic = []
         for j, topic in enumerate(topics):
-            topic = topic.replace('について', '').replace('まずは、', '').replace('まずは', '').replace('まず、', '').replace('まず', '').replace('次に、', '').replace('最後に、', '').replace('最後に', '')
+            topic = topic.replace('について', '').replace('まずは、', '').replace('まずは', '').replace('まず、', '').replace('まず', '').replace('次に、', '').replace('最後に、', '').replace('最後に', '').replace('最後の、', '').replace('最後の', '')
             replaced_topic.append({j: topic})
         
-            while True:
-                for topic in replaced_topic:
-                    for key, value in topic.items():
-                        print(f"{key}: {value}")
+        for topic in replaced_topic:
+            for key, value in topic.items():
+                print(f"{key}: {value}")
 
-                user_input = input("======タイトルに合う数字を入力してください: =======")
-                if user_input == '':
-                    return ''
-                found = False
-                for topic in replaced_topic:
-                    for key in topic.keys():
-                        if str(key) == user_input:
-                            title = topic[key]
-                            found = True
-                            break
-                    if found:
+        while True:
+            user_input = input("=========タイトルに合う数字を入力してください:")
+            found = False
+            for topic in replaced_topic:
+                for key in topic.keys():
+                    if str(key) == user_input:
+                        title = topic[key]
+                        found = True
                         break
-
                 if found:
                     break
-
-        return title
+                else:
+                    title = user_input
+            return title
 
 
 def main():
@@ -152,7 +148,7 @@ def main():
 
         for csv_file, title_file in zip(csv_sorted_files, title_sorted_files):
             try:
-                make_dir = '/work/label_data/' + str(i) + '_data'
+                make_dir = '/work/title_labeled_data/' + str(i) + '_data'
                 if not os.path.exists(make_dir):
                     os.makedirs(make_dir)
             except Exception as e:
@@ -164,15 +160,18 @@ def main():
                 reader_title = csv.reader(title_read_file)
                 rows_title = list(reader_title)
 
-            count = 0
-            for row_csv in rows_csv:
-                count += 1
-                if count == 1:
+            for t, row_csv in enumerate(rows_csv):
+                # 議長は入れない
+                if t == 0:
+                    meeting = row_csv[2]
                     speaker = row_csv[3]
                 
-                remove_match = r"(これより|ただいまから)|((.*)の実施について(ご|御)報告(いた|致)します)|(何とぞ(ご|御)理解と(ご|御)協力をお願いいたします)|(順次これを許します)|((ご|御)異議(は)*ありませんか)|(お諮りいたします)|(御異議なしと認めます)|(起立を求めます)|(以上、御報告申し上げます)|(そのように決しました)|(関連質疑の申出があります)|(これにて(.*)の質疑は終了いたしました)|(持ち時間の範囲内でこれを許します)"                
-                if not (row_csv[3] == speaker or re.search(remove_match, row_csv[8])):                    
-                    with open('/work/label_data/' + str(i) + '_data/' + row_csv[0] + '.csv', 'a') as csv_write_file:
+                if not meeting == row_csv[2]:
+                    meeting = row_csv[2]
+                    speaker = row_csv[3]
+
+                if not speaker == row_csv[3]:
+                    with open('/work/title_labeled_data/' + str(i) + '_data/' + row_csv[0] + '.csv', 'a') as csv_write_file:
                         for row_title in rows_title:
                             row_title[8].replace('\n\n', '\n').replace('\n', ' ')
                             candidate_title = row_title[8].split()
@@ -188,41 +187,24 @@ def main():
                             row_csv[6]  = get_title(row_csv[8])
 
                         
-                        # label = get_label(row_csv[8])
-                        # row_csv[7] = label
-                        writer = csv.writer(csv_write_file)
-                        writer.writerow(row_csv)
-                        
-
-
-
-                    """
-                        漢数字 + 10分が出てきたら適宜出力 
-                        それをそのままにするのか or アラビア数字に直すか
-                        while True:
-                            if re.search('((〇|一|二|三|四|五|六|七|八|九|十|百|千|万)+)|(10分)', row[8]):
-                                user_input = input('1: アラビア数字に変更, 0: そのまま')
-                                if user_input == '1':
-                                    converter(row[8])
-                                    break
-                                elif user_input == '0':
-                                    break
-                                else:  
-                                    print('無効な入力です')
-                    """
-
-                    """
+                        row_csv[8]= get_label(row_csv[8])
+                        # writer = csv.writer(csv_write_file)
+                        # writer.writerow(row_csv)
                     
-                    if row_csv[0] == row_title[0] and row_csv[1] == row_title[1] and row_csv[2] == row_title[2] and row_title[8]:
-                        row_title[8] = row_title[8].replace('\n\n', '\n').replace('\n', ' ')
-                    
-                        row_titleをさらにsplitしてその数が >= 1なら、タイトルを選択するように
-                        row_csv[8]の中で (次に)|(次に、)~~~について(主に)|(誰に)伺ってまいります|伺います|伺いたいと思います
-                                        ~~~がタイトル
-                        その時はspeakerを変更しておく
-                        row_csv[6] = row_title[8]   
-                    """
-
+                        """
+                            漢数字 + 10分が出てきたら適宜出力 
+                            それをそのままにするのか or アラビア数字に直すか
+                            while True:
+                                if re.search('((〇|一|二|三|四|五|六|七|八|九|十|百|千|万)+)|(10分)', row[8]):
+                                    user_input = input('1: アラビア数字に変更, 0: そのまま')
+                                    if user_input == '1':
+                                        converter(row[8])
+                                        break
+                                    elif user_input == '0':
+                                        break
+                                    else:  
+                                        print('無効な入力です')
+                        """
 
 if __name__ == "__main__":
     main()
