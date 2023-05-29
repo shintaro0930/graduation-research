@@ -1,4 +1,2 @@
-/data
-/__pycache__
-/mecab-ipadic-neologd
-!/data/2022_data/2022_12_74.xml
+/*
+/data/*

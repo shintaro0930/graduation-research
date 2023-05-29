@@ -8,6 +8,11 @@ import os
 """
 参考リンク
 https://qiita.com/kenta1984/items/1acfddb3d920a11e6c8b
+
+
+国会議事録APIを用いて全議会録をクローリングする
+
+2023/4/1時点で使う必要はないはず
 """
 
 def main(year:int) -> None:
@@ -29,7 +34,7 @@ def main(year:int) -> None:
         loop_num = int(root[0].text) // q_maximumRecords + 1
 
         try:
-            make_dir = '/work/data/' + str(year) + '_data'
+            make_dir = './data/' + str(year) + '_data'
             if not os.path.exists(make_dir):
                 os.makedirs(make_dir)
         except Exception as e:
@@ -44,7 +49,7 @@ def main(year:int) -> None:
             payload_encoded = urllib.parse.quote(payload)
             r = requests.get(base_url + payload_encoded)
 
-            with open('/work/data/' + str(year) + '_data/' + str(year) + '_' + str(month) + '_' + str(i) + '.xml', mode='w') as f:
+            with open('./data/' + str(year) + '_data/' + str(year) + '_' + str(month) + '_' + str(i) + '.xml', mode='w') as f:
                 f.write(r.text)
 
             i += 1
@@ -54,5 +59,5 @@ if __name__ == "__main__":
     base_url = 'http://kokkai.ndl.go.jp/api/1.0/speech?'
     # 1947-2022年まで拾える
     #main(year)でひろう
-    for year in range(1947, 2023):
+    for year in range(2022, 2023):
         main(year)           
