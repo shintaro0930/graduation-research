@@ -3,7 +3,10 @@
 /mecab-ipadic-neologd
 /csv_data
 /nohup.out
-/title_labeled_data
-/cyber.py
+/full_data
+/src/cyber.py
 /ntcir14
 /title_data
+/text_list
+/spm
+/pictures
