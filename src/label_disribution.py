@@ -29,4 +29,4 @@ plt.title('Distribution of Labels')
 for i, count in enumerate(label_counts):
     plt.text(i, count + 10, f'Total Count: {count}', ha='center')
 
-plt.savefig('result.jpg')
+plt.savefig('../pictures/result.jpg')
