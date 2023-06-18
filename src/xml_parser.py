@@ -5,13 +5,6 @@ import MeCab
 
 mecab = MeCab.Tagger ("-d /work/mecab-ipadic-neologd/build/mecab-ipadic-2.7.0-20070801-neologd-20200910/")
 
-
-import MeCab
-
-mecab = MeCab.Tagger ("-d /work/mecab-ipadic-neologd/build/mecab-ipadic-2.7.0-20070801-neologd-20200910/")
-
-
-
 """
 国会議事録ファイル(xmlファイル)から読めるようにパースして, 'result.txt'ファイルに書き込む
 """
