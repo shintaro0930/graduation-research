@@ -11,3 +11,5 @@
 /spm
 /pictures
 /tmp_work
+/word_cloud/*.jpg
+/word_cloud/matplotlibrc
