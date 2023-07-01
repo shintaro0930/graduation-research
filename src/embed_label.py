@@ -6,6 +6,10 @@ import unicodedata
 
 
 
+"""
+2023/6/30時点で最新のファイル
+"""
+
 def get_label(text) -> int:
     with open('../text_list/pro_list.txt', 'r') as prolist, open('../text_list/con_list.txt', 'r') as conlist, open('../text_list/others_list.txt', 'r') as otherslist, open('../text_list/remove_list.txt', 'r') as removelist:
         pro_expressions:list = prolist.read().replace('。', '').split('\n')
